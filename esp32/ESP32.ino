@@ -8,8 +8,11 @@
 
 const char* ssid = "Star Shopping";    // Your network's SSID
 const char* password = "Samuezechia";   // Your network's password
+const char* mqtt_server = "192.168.1.70";   // Raspberry Pi IP.
 
 DHT dht(DHTPIN, DHTTYPE);
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 void setup() {
   Serial.begin(115200);
