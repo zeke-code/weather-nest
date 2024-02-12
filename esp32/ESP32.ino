@@ -6,10 +6,10 @@
 #define DHTTYPE DHT11   // DHT 11
 #define MAX_ATTEMPTS 20  // Maximum number of attempts to connect to wifi network
 
-const char* ssid = "Star Shopping";    // Your network's SSID
-const char* password = "Samuezechia";   // Your network's password
-const char* mqtt_server = "192.168.1.70";   // Raspberry Pi IP.
-
+const char* ssid = "SSID";    // Your network's SSID
+const char* password = "PASSWORD";   // Your network's password
+const char* mqtt_server = "192.168.1.144";   // Raspberry Pi IP.
+const int mqtt_port = 1883;
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -21,6 +21,10 @@ void setup() {
 }
 
 void loop() {
+  if (!client.connected()) {
+    reconnect_mqtt();
+  }
+  client.loop();
   readTemperature();
 }
 
@@ -39,6 +43,10 @@ void readTemperature() {
   Serial.print("%  Temperature: ");
   Serial.print(temperature);
   Serial.println("°C ");
+
+  char temperatureString[8];
+  dtostrf(temperature, 6, 2, temperatureString);
+  client.publish("esp32/temperature", temperatureString);
   delay(2000);
 }
 
@@ -59,5 +67,23 @@ void connectToWifi() {
   } else {
     Serial.println("\nFailed to connect to WiFi. Check SSID or password. Restarting...");
     ESP.restart();
+  }
+}
+
+void setup_mqtt() {
+  client.setServer(mqtt_server, mqtt_port);
+}
+
+void reconnect_mqtt() {
+  while (!client.connected()) {
+    Serial.println("Attempting MQTT connection...");
+    if (client.connect("ESP32Client")) {
+      Serial.println("Connected to MQTT broker");
+    } else {
+      Serial.print("Failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
   }
 }
