@@ -9,9 +9,9 @@ def on_message(client, userdata, message):
     print(f'Received message: {msg}')
 
     elements = [(msg['temperature'], msg['humidity'], msg['timestamp'])]
-    database.insert(elements, 'measurements', 'temperature, humidity, timestamp')
+    database.insert(elements, 'measurementsexit', 'temperature, humidity, timestamp')
 
-database = db_manager('localhost', 'admin', 'admin', 'weather')
+database = db_manager('pythonUser', 'pythonPWD', 'localhost', 'weather')
     
 client = mqtt.Client('subscriber')
 client.connect('localhost', 1883)
