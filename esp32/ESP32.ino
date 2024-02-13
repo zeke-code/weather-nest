@@ -1,25 +1,35 @@
 #include <DHT.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
 
 #define DHTPIN 4     // What digital pin the DHT11 is connected to (PIN 2 gives problems during the upload of the sketch, beware.)
 #define DHTTYPE DHT11   // DHT 11
 #define MAX_ATTEMPTS 20  // Maximum number of attempts to connect to wifi network
 
-const char* ssid = "Star Shopping";    // Your network's SSID
-const char* password = "Samuezechia";   // Your network's password
+const char* ssid = "";    // Your network's SSID
+const char* password = "";   // Your network's password
 const char* mqtt_server = "192.168.1.144";   // Raspberry Pi IP.
 const int mqtt_port = 1883;
-const char* mqtt_topic="testTopic";   // MQTT Topic.
+const char* mqtt_topic="temperature";   // MQTT Topic.
+const char* ntpServer = "pool.ntp.org";   // NTP server for clock
+const long utcOffset = 3600;    // Your country's time zone (It's set to Italy right now)
+
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient espClient;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, ntpServer, utcOffset);
 PubSubClient client(espClient);
 
 void setup() {
   Serial.begin(115200);
   dht.begin();
-  client.setServer(mqtt_server, mqtt_port);
   connectToWifi();
+  timeClient.begin();
+  delay(1000);
+  client.setServer(mqtt_server, mqtt_port);
 }
 
 void loop() {
@@ -27,6 +37,7 @@ void loop() {
     reconnect_mqtt();
   }
   client.loop();
+  timeClient.update();
   readTemperature();
   delay(2000);
 }
@@ -41,16 +52,19 @@ void readTemperature() {
     return;
   }
 
-  Serial.print("Humidity: ");
-  Serial.print(humidity);
-  Serial.print("%  Temperature: ");
-  Serial.print(temperature);
-  Serial.println("°C ");
+  humidity = round(humidity * 100) / 100.0;
+  temperature = round(temperature * 100) / 100.0;
 
-  char temperatureString[8];
-  dtostrf(temperature, 6, 2, temperatureString);
-  client.publish(mqtt_topic, temperatureString);
-  delay(2000);
+  Serial.printf("Humidity: %.2f%%  Temperature: %.2f°C \n", humidity, temperature);
+
+  StaticJsonDocument<200> doc;
+  doc["temperature"] = temperature;
+  doc["humidity"] = humidity;
+  doc["timestamp"] = timeClient.getEpochTime();
+
+  char jsonOutput[128];
+  serializeJson(doc, jsonOutput);
+  client.publish(mqtt_topic, jsonOutput);
 }
 
 void connectToWifi() {
