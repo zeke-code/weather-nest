@@ -9,8 +9,8 @@
 #define DHTTYPE DHT11   // DHT 11
 #define MAX_ATTEMPTS 20  // Maximum number of attempts to connect to wifi network
 
-const char* ssid = "";    // Your network's SSID
-const char* password = "";   // Your network's password
+const char* ssid = "Star Shopping";    // Your network's SSID
+const char* password = "Samuezechia";   // Your network's password
 const char* mqtt_server = "192.168.1.144";   // Raspberry Pi IP.
 const int mqtt_port = 1883;
 const char* mqtt_topic="temperature";   // MQTT Topic.

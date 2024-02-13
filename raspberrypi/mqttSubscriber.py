@@ -1,15 +1,22 @@
 import paho.mqtt.client as mqtt
+import json
+from db_manager import db_manager
 import time
 
-def message (client, userdata, message):
-    topic = str(message.topic)
-    message = str(message.payload.decode('utf-8'))
-    print(topic, ": ", message)
+def on_message(client, userdata, message):
+    msg_payload = message.payload.decode('utf-8')
+    msg = json.loads(msg_payload)
+    print(f'Received message: {msg}')
+
+    elements = [(msg['temperature'], msg['humidity'], msg['timestamp'])]
+    database.insert(elements, 'measurements', 'temperature, humidity, timestamp')
+
+database = db_manager('localhost', 'admin', 'admin', 'weather')
     
 client = mqtt.Client('subscriber')
 client.connect('localhost', 1883)
-client.subscribe('testTopic')
-client.on_message = message
+client.subscribe('temperature')
+client.on_message = on_message
 client.loop_start()
 
 while(1):
