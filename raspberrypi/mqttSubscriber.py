@@ -13,7 +13,7 @@ def on_message(client, userdata, message):
 
 database = db_manager('pythonUser', 'pythonPWD', 'localhost', 'weather')
     
-client = mqtt.Client('subscriber')
+client = mqtt.Client('subscriber', callback_api_version=1.0)
 client.connect('localhost', 1883)
 client.subscribe('temperature')
 client.on_message = on_message
