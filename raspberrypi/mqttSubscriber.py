@@ -2,13 +2,17 @@ import paho.mqtt.client as mqtt
 import json
 from db_manager import db_manager
 import time
+from datetime import datetime
 
 def on_message(client, userdata, message):
     msg_payload = message.payload.decode('utf-8')
     msg = json.loads(msg_payload)
     print(f'Received message: {msg}')
 
-    elements = [(msg['temperature'], msg['humidity'], msg['timestamp'])]
+    timestamp = datetime.fromtimestamp(msg['timestamp'])
+    formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+    elements = [(msg['temperature'], msg['humidity'], formatted_timestamp)]
     database.insert(elements, 'measurements', 'temperature, humidity, timestamp')
 
 database = db_manager('pythonUser', 'pythonPWD', 'localhost', 'weather')
