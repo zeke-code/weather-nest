@@ -26,4 +26,4 @@ client.loop_start()
 app.register_blueprint(views, url_prefix='/')
 
 if __name__ == '__main__':
-    app.run(port=8000)
+    app.run(port=8000, debug=True)
