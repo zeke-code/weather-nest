@@ -14,8 +14,13 @@ const char* password = "Samuezechia";   // Your network's password
 const char* mqtt_server = "192.168.1.144";   // Raspberry Pi IP.
 const int mqtt_port = 1883;
 const char* mqtt_topic="temperature";   // MQTT Topic.
+const char* mqtt_callback="esp32/config";
 const char* ntpServer = "pool.ntp.org";   // NTP server for clock
 const long utcOffset = 3600;    // Your country's time zone (It's set to Italy right now)
+float temperature_offset = 0;
+float humidity_offset = 0;
+
+int measure_delay = 10000;
 
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient espClient;
@@ -28,8 +33,10 @@ void setup() {
   dht.begin();
   connectToWifi();
   timeClient.begin();
-  delay(1000);
+  delay(measure_delay);
   client.setServer(mqtt_server, mqtt_port);
+  client.subscribe(mqtt_callback);
+  client.setCallback(callback);
 }
 
 void loop() {
@@ -39,7 +46,7 @@ void loop() {
   client.loop();
   timeClient.update();
   readTemperature();
-  delay(2000);
+  delay(10000);
 }
 
 void readTemperature() {
@@ -51,7 +58,9 @@ void readTemperature() {
     Serial.println("Failed to read from DHT sensor!");
     return;
   }
-
+  
+  humidity += humidity_offset;
+  temperature += temperature_offset;
   humidity = round(humidity * 100) / 100.0;
   temperature = round(temperature * 100) / 100.0;
 
@@ -92,12 +101,27 @@ void reconnect_mqtt() {
     Serial.println("Attempting MQTT connection...");
     if (client.connect("ESP32Client", "admin", "admin")) {
       Serial.println("Connected to MQTT broker");
-      client.publish(mqtt_topic, "HELLO WORLD!");
+      client.subscribe(mqtt_callback);
     } else {
       Serial.print("Failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
       delay(5000);
     }
+  }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  StaticJsonDocument<256> doc;
+  deserializeJson(doc, payload, length);
+
+  String type = doc["type"].as<String>();
+
+  if (type == "delay") {
+    measure_delay = doc["value"];
+  } else if (type == "humidity_offset") {
+    humidity_offset = doc["value"];
+  } else if (type == "temperature_offset") {
+    temperature_offset = doc["value"];
   }
 }

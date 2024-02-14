@@ -6,6 +6,6 @@ client.connect()
 client.loop_start()
 
 while(1):
-    client.publish('testTopic', 'testMessage')
+    client.publish('esp/32', 'testMessage')
     time.sleep(2)
     
