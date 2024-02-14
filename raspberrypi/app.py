@@ -24,6 +24,10 @@ client.on_message = on_message
 client.loop_start()
 
 app.register_blueprint(views, url_prefix='/')
+app.config['MYSQL_HOST'] = 'raspberrypi'
+app.config['MYSQL_USER'] = 'pythonUser'
+app.config['MYSQL_PASSWORD'] = 'pythonPWD'
+app.config['MYSQL_DB'] = 'weather'
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)

@@ -1,9 +1,14 @@
 import mysql.connector
-from flask import jsonify
+from flask import jsonify, current_app
 
 class db_manager:
     def __init__(self, user, pwd, url, db):
-        self.connection = mysql.connector.connect(user=user, password=pwd, host=url, database=db)
+        self.connection = mysql.connector.connect(
+            user=current_app.config['MYSQL_USER'],
+            pwd=current_app.config['MYSQL_PASSWORD'],
+            url=current_app.config['MYSQL_HOST'],
+            db=current_app.config['MYSQL_DB'],
+        )
 
     def select(self, query, params):
         cursor = self.connection.cursor()
