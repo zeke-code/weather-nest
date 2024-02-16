@@ -6,9 +6,9 @@ class db:
     def __init__(self, user, pwd, url, db):
         self.connection = mysql.connector.connect(user=user, password=pwd, host=url, database=db)
 
-    def select(self, query):
+    def select(self, query, params=None):
         cursor = self.connection.cursor()
-        cursor.execute(query)
+        cursor.execute(query, params)
         row_headers=[x[0] for x in cursor.description]
         json_data = []
         for result in cursor.fetchall():

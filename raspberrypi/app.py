@@ -24,6 +24,11 @@ def on_message(client, userdata, message):
     formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
     elements = ((msg['temperature'], msg['humidity'], formatted_timestamp))
+    db_manager = db(
+        app.config['DB_USERNAME'],
+        app.config['DB_PASSWORD'],
+        app.config['DB_URL'],
+        app.config['DB_NAME'])
     db_manager.insert(elements, 'measurements', 'temperature, humidity, timestamp')
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, 'subscriber')
@@ -32,11 +37,10 @@ client.subscribe('temperature')
 client.on_connect = on_connect
 client.on_message = on_message
 client.loop_start()
-db_username = 'pythonUser'
-db_password = 'pythonPWD'
-db_url = 'localhost'
-db_dbname = 'weather'
-db_manager = db(db_username, db_password, db_url, db_dbname)
+app.config['DB_USERNAME'] = 'pythonUser'
+app.config['DB_PASSWORD'] = 'pythonPWD'
+app.config['DB_URL'] = 'localhost'
+app.config['DB_NAME'] = 'weather'
 
 
 
@@ -45,3 +49,4 @@ app.register_blueprint(views, url_prefix='/')
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)
+
