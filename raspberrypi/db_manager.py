@@ -1,46 +1,25 @@
-from flask import Flask
-import json
-import paho.mqtt.client as mqtt
-from views import views
-from db_manager import db_manager
-from datetime import datetime
-
-app = Flask(__name__)
-
-MQTT_BROKER_HOST = 'localhost'
-MQTT_BROKER_PORT = 1883
-MQTT_TOPIC = 'temperature'
-
-def on_connect(client, userdata, flags, rc):
-    print('Connected to broker with state code: ' + str(rc))
-    client.subscribe(MQTT_TOPIC)
-
-def on_message(client, userdata, message):
-    msg_payload = message.payload.decode('utf-8')
-    msg = json.loads(msg_payload)
-    print(f'Received message: {msg}')
-
-    timestamp = datetime.fromtimestamp(msg['timestamp'])
-    formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
-
-    elements = [(msg['temperature'], msg['humidity'], formatted_timestamp)]
-    database_manager.insert(elements, 'measurements', 'temperature, humidity, timestamp')
-
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, 'subscriber')
-client.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
-client.subscribe('temperature')
-client.on_connect = on_connect
-client.on_message = on_message
-client.loop_start()
-app.config['MYSQL_USER'] = 'pythonUser'
-app.config['MYSQL_PASSWORD'] = 'pythonPWD'
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_DB'] = 'weather'
-database_manager = db_manager(app)
+import mysql.connector
+from flask import jsonify
 
 
-app.register_blueprint(views, url_prefix='/')
+class db:
+    def __init__(self, url, user, pwd, db):
+        self.connection = mysql.connector.connect(user=user, password=pwd, host=url, database=db)
 
-
-if __name__ == '__main__':
-    app.run(port=8000, debug=True)
+    def select(self, query):
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        row_headers=[x[0] for x in cursor.description]
+        json_data = []
+        for result in cursor.fetchall():
+            json_data.append(dict(zip(row_headers, result)))
+        cursor.close()
+        return jsonify(json_data)
+    
+    def insert(self, elements, table, col):
+        cursor = self.connection.cursor()
+        for element in elements:
+            cursor.execute('INSERT INTO ' + table + ' (' + col + ' ) VALUES (%f)' % (element))
+        self.connection.commit()
+        self.connection.close()
+        return 'Insert was successful!', 200

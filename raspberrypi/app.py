@@ -24,7 +24,7 @@ def on_message(client, userdata, message):
     formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
     elements = [(msg['temperature'], msg['humidity'], formatted_timestamp)]
-    database_manager.insert(elements, 'measurements', 'temperature, humidity, timestamp')
+    db_manager.insert(elements, 'measurements', 'temperature, humidity, timestamp')
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, 'subscriber')
 client.connect(MQTT_BROKER_HOST, MQTT_BROKER_PORT)
@@ -36,7 +36,6 @@ app.config['MYSQL_USER'] = 'pythonUser'
 app.config['MYSQL_PASSWORD'] = 'pythonPWD'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_DB'] = 'weather'
-database_manager = db_manager(app)
 
 
 app.register_blueprint(views, url_prefix='/')
