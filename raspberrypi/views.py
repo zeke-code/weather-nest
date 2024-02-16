@@ -8,6 +8,10 @@ views = Blueprint('views', __name__)
 def home():
     return render_template('index.html')
 
+@views.route('/configure')
+def configure_page():
+    return None
+
 @views.route('/api/temperatures/', methods=['GET'])
 def get_daily_temperatures():
     current_date = datetime.now().date()
@@ -23,5 +27,3 @@ def get_daily_temperatures():
         db='weather')
     data = db_manager.select(query=query, params=params)
     return data
-
-    
