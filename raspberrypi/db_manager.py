@@ -3,7 +3,7 @@ from flask import jsonify
 
 
 class db:
-    def __init__(self, url, user, pwd, db):
+    def __init__(self, user, pwd, url, db):
         self.connection = mysql.connector.connect(user=user, password=pwd, host=url, database=db)
 
     def select(self, query):
@@ -17,9 +17,11 @@ class db:
         return jsonify(json_data)
     
     def insert(self, elements, table, col):
+        columns = col.split(', ')
+        placeholders = ', '.join(['%s'] * len(columns))
+        query = 'INSERT INTO ' + table + ' (' + ', '.join(columns) + ') VALUES (' + placeholders + ')'
         cursor = self.connection.cursor()
-        for element in elements:
-            cursor.execute('INSERT INTO ' + table + ' (' + col + ' ) VALUES (%f)' % (element))
+        cursor.execute(query, elements)
         self.connection.commit()
-        self.connection.close()
+        cursor.close()
         return 'Insert was successful!', 200

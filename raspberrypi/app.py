@@ -2,7 +2,7 @@ from flask import Flask
 import json
 import paho.mqtt.client as mqtt
 from views import views
-from db_manager import db_manager
+from db_manager import db
 from datetime import datetime
 
 app = Flask(__name__)
@@ -23,7 +23,7 @@ def on_message(client, userdata, message):
     timestamp = datetime.fromtimestamp(msg['timestamp'])
     formatted_timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
-    elements = [(msg['temperature'], msg['humidity'], formatted_timestamp)]
+    elements = ((msg['temperature'], msg['humidity'], formatted_timestamp))
     db_manager.insert(elements, 'measurements', 'temperature, humidity, timestamp')
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, 'subscriber')
@@ -32,10 +32,12 @@ client.subscribe('temperature')
 client.on_connect = on_connect
 client.on_message = on_message
 client.loop_start()
-app.config['MYSQL_USER'] = 'pythonUser'
-app.config['MYSQL_PASSWORD'] = 'pythonPWD'
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_DB'] = 'weather'
+db_username = 'pythonUser'
+db_password = 'pythonPWD'
+db_url = 'localhost'
+db_dbname = 'weather'
+db_manager = db(db_username, db_password, db_url, db_dbname)
+
 
 
 app.register_blueprint(views, url_prefix='/')
