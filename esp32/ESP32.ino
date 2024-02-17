@@ -33,7 +33,7 @@ void setup() {
   dht.begin();
   connectToWifi();
   timeClient.begin();
-  delay(measure_delay);
+  delay(1000);
   client.setServer(mqtt_server, mqtt_port);
   client.subscribe(mqtt_callback);
   client.setCallback(callback);
@@ -46,7 +46,7 @@ void loop() {
   client.loop();
   timeClient.update();
   readTemperature();
-  delay(10000);
+  delay(measure_delay);
 }
 
 void readTemperature() {
