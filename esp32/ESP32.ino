@@ -16,7 +16,7 @@ const int mqtt_port = 1883;
 const char* mqtt_topic="temperature";   // MQTT Topic.
 const char* mqtt_callback="esp32/config";
 const char* ntpServer = "pool.ntp.org";   // NTP server for clock
-const long utcOffset = 3600;    // Your country's time zone (It's set to Italy right now)
+const long utcOffset = 3600;    // Your country's time zone offset
 float temperature_offset = 0;
 float humidity_offset = 0;
 
