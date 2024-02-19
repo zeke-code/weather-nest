@@ -62,8 +62,8 @@ export default defineComponent({
     <div class="container text-center">
         <div class="row">
             <div class="col-12">
-                <h1 class="mt-4">Hey, welcome back on Weather Nest!</h1>
-                <h2>Here are the temperatures of <span>today!</span></h2>
+                <h1 class="mt-4">Hey, welcome back to Weather Nest!</h1>
+                <h2>Here are the temperatures of today</h2>
                 <canvas class="mt-4" id="temperatureChart"></canvas>
             </div>
         </div>
