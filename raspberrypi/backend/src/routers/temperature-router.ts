@@ -3,6 +3,6 @@ import * as temperatureController from '../controllers/temperature-controller';
 
 const router: Router = Router();
 
-router.get('/api/test', temperatureController.modifyConfiguration)
+router.get('/api/config', temperatureController.modifyConfiguration)
 
 export default router;
