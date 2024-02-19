@@ -64,7 +64,7 @@ void readTemperature() {
   humidity = round(humidity * 100) / 100.0;
   temperature = round(temperature * 100) / 100.0;
 
-  Serial.printf("Humidity: %.2f%%  Temperature: %.2f°C \n", humidity, temperature);
+  Serial.printf("Humidity: %.2f%%  Temperature: %.2f°C  Time: %ld \n", humidity, temperature, timeClient.getEpochTime());
 
   StaticJsonDocument<200> doc;
   doc["temperature"] = temperature;
