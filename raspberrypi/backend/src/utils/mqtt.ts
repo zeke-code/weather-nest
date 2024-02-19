@@ -30,19 +30,14 @@ export function initMqttClient() {
         function pad(number: number) {
         return number < 10 ? '0' + number : number;
         }
-        const formattedDate = date.getFullYear() + '-' + 
-                                pad(date.getMonth() + 1) + '-' + 
-                                pad(date.getDate()) + ' ' + 
-                                pad(date.getHours()) + ':' + 
-                                pad(date.getMinutes()) + ':' + 
-                                pad(date.getSeconds());
+        const formattedDate = format(new Date(epoch * 1000), 'yyyy-MM-dd HH:mm:ss');
 
         const connection = await getConnection();
         connection.execute(
             `INSERT INTO measurements (temperature, humidity, timestamp) VALUES (?, ?, ?)`,
             [msg.temperature, msg.humidity, formattedDate]
         );
-        
+        console.log(`Successfully inserted entry into database.`)
     })
 
     client.on('error', function (error) {
