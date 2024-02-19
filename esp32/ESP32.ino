@@ -20,7 +20,7 @@ const long utcOffset = 3600;    // Your country's time zone (It's set to Italy r
 float temperature_offset = 0;
 float humidity_offset = 0;
 
-int measure_delay = 60000;    // Measurements delay (set at one minute at the moment)
+int measure_delay = 10000;    // Measurements delay
 
 DHT dht(DHTPIN, DHTTYPE);
 WiFiClient espClient;
