@@ -5,7 +5,7 @@ let connection: Connection | null = null;
 export const getConnection = async() => {
     if(!connection) {
         connection = await mysql.createConnection({
-            host: 'localhost',
+            host: '127.0.0.1',
             user: 'pythonUser',
             password: 'pythonPWD',
             database: 'weather'
