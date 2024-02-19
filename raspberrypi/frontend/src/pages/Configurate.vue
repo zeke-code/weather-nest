@@ -1,12 +1,19 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
+import axios from 'axios';
 
 export default defineComponent({
     data() {
 
     },
     methods: {
-
+        async submitForm(event: Event) {
+            event.preventDefault();
+            const response = await axios.get('/api/test');
+            if (response.status === 200) {
+                alert('Test was successful!');
+            }
+        }
     },
     mounted() {
 
@@ -18,7 +25,7 @@ export default defineComponent({
     <div class="container">
         <div class="row">
             <div class="col-6 mx-auto">
-                <form class="mt-5">
+                <form class="mt-5" @submit="submitForm">
                     <div class="mb-3">
                     <label for="delay" class="form-label">Delay (ms)</label>
                     <input type="number" class="form-control" id="delay" aria-describedby="delayHelp">

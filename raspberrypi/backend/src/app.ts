@@ -1,10 +1,13 @@
 import express, { Express } from 'express'
 import bodyParser from 'body-parser'
+import temperatureRouter from './routers/temperature-router'
 
 const app: Express = express();
 const port: number = 8000;
 
 app.use(bodyParser.json());
+
+app.use(temperatureRouter);
 
 app.use(express.static('public'))
 app.use(function(req, res, next) {
