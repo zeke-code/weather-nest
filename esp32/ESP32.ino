@@ -112,16 +112,10 @@ void reconnect_mqtt() {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  String jsonStr;
   StaticJsonDocument<256> doc;
+  serializeJson(doc, jsonStr);
+  Serial.print(jsonStr);
+  Serial.println("Entering callback function.");
   deserializeJson(doc, payload, length);
-
-  String type = doc["type"].as<String>();
-
-  if (type == "delay") {
-    measure_delay = doc["value"];
-  } else if (type == "humidity_offset") {
-    humidity_offset = doc["value"];
-  } else if (type == "temperature_offset") {
-    temperature_offset = doc["value"];
-  }
 }

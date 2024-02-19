@@ -1,9 +1,12 @@
 import express, { Express } from 'express'
 import bodyParser from 'body-parser'
 import temperatureRouter from './routers/temperature-router'
+import { mqttService } from './utils/mqtt';
 
 const app: Express = express();
 const port: number = 8000;
+
+mqttService;
 
 app.use(bodyParser.json());
 

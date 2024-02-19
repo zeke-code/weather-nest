@@ -1,46 +1,72 @@
-import * as mqtt from 'mqtt'
-import { format } from 'date-fns'
-import { Message } from './interfaces'
+import * as mqtt from 'mqtt';
+import { format } from 'date-fns';
 import { getConnection } from './database';
+import { Message } from './interfaces';
 
-const MQTT_BROKER_HOST = 'mqtt://127.0.0.1';
-const MQTT_BROKER_PORT = 1883;
+const MQTT_BROKER_URL = 'mqtt://127.0.0.1';
 const MQTT_DEFAULT_TOPIC = 'temperature';
 
-export function initMqttClient() {
+class MQTTService {
+    private client: mqtt.MqttClient;
 
-    const client = mqtt.connect(MQTT_BROKER_HOST, {
-        clientId: 'subscriber',
-        port: MQTT_BROKER_PORT
-    });
+    constructor() {
+        this.client = mqtt.connect(MQTT_BROKER_URL, {
+            port: 1883,
+        });
 
-    console.log('Trying to connect to a broker...')
-    client.on('connect', () => {
-        console.log('Connected to broker');
-        client.subscribe(MQTT_DEFAULT_TOPIC);
-    });
+        this.client.on('connect', () => {
+            console.log('MQTT Client Connected');
+            this.subscribe(MQTT_DEFAULT_TOPIC);
+        });
 
-    client.on('message', async (topic, message) => {
+        this.client.on('message', async (topic, message) => {
+            await this.handleMessage(topic, message);
+        });
+
+        this.client.on('error', (error) => {
+            console.error('MQTT Client Error:', error);
+        });
+    }
+
+    public subscribe(topic: string = MQTT_DEFAULT_TOPIC) {
+        this.client.subscribe(topic, {}, (error) => {
+            if (error) {
+                console.error(`Subscribe to topic ${topic} failed:`, error);
+            } else {
+                console.log(`Subscribed to topic "${topic}"`);
+            }
+        });
+    }
+
+    public async publish(topic: string, message: string | Buffer) {
+        this.client.publish(topic, message, {}, (error) => {
+            if (error) {
+                console.error(`Publish to topic ${topic} failed:`, error);
+            } else {
+                console.log(`Message published to topic "${topic}"`);
+            }
+        });
+    }
+
+    private async handleMessage(topic: string, message: Buffer) {
         const msgPayload = message.toString();
         const msg: Message = JSON.parse(msgPayload);
-        console.log('Received a message: ' + msgPayload);
-        const epoch = msg['timestamp'];
-        const date = new Date(epoch * 1000);
+        console.log(`Received message on topic "${topic}":`, msgPayload);
 
-        function pad(number: number) {
-        return number < 10 ? '0' + number : number;
+        const formattedDate = format(new Date(msg.timestamp * 1000), 'yyyy-MM-dd HH:mm:ss');
+
+        try {
+            const connection = await getConnection();
+            await connection.execute(
+                `INSERT INTO measurements (temperature, humidity, timestamp) VALUES (?, ?, ?)`,
+                [msg.temperature, msg.humidity, formattedDate]
+            );
+            console.log('Successfully inserted entry into database.');
+        } catch (error) {
+            console.error('Error inserting message into database:', error);
         }
-        const formattedDate = format(new Date(epoch * 1000), 'yyyy-MM-dd HH:mm:ss');
-
-        const connection = await getConnection();
-        connection.execute(
-            `INSERT INTO measurements (temperature, humidity, timestamp) VALUES (?, ?, ?)`,
-            [msg.temperature, msg.humidity, formattedDate]
-        );
-        console.log(`Successfully inserted entry into database.`)
-    })
-
-    client.on('error', function (error) {
-        console.log('Something went wrong: ' + error);
-    })
+    }
 }
+
+// Exporting an instance to be reused across the application
+export const mqttService = new MQTTService();
