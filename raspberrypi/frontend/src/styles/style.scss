@@ -1,0 +1,9 @@
+@import '_variables.scss', '_mixins.scss';
+@import 'bootstrap';
+
+body {
+    font-family: $font-stack;
+    min-height: 100vh;
+    margin: 0;
+    background-color: $body-color;
+}
