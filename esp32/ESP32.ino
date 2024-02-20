@@ -129,6 +129,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   int delayPayload = doc["delay"];
   float temperatureOffsetPayload = doc["temperatureOffset"];
   float humidityOffsetPayload = doc["humidityOffset"];
+  int keepAlivePayload = doc["keepAlive"];
 
   Serial.print("New delay: ");
   Serial.println(delayPayload);
@@ -140,4 +141,5 @@ void callback(char* topic, byte* payload, unsigned int length) {
   measure_delay = delayPayload;
   temperature_offset = temperatureOffsetPayload;
   humidity_offset = humidityOffsetPayload;
+  keep_alive = keepAlivePayload;
 }

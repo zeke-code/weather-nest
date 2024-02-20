@@ -7,7 +7,8 @@ export default defineComponent({
         return {
             delay: 0,
             temperatureOffset: 0,
-            humidityOffset: 0
+            humidityOffset: 0,
+            keepAlive: 0
         }
     },
     methods: {
@@ -16,7 +17,8 @@ export default defineComponent({
             const response = await axios.post('/api/config', {
                 delay: this.delay,
                 temperatureOffset: this.temperatureOffset,
-                humidityOffset: this.humidityOffset
+                humidityOffset: this.humidityOffset,
+                keepAlive: this.keepAlive,
             });
             if (response.status === 200) {
                 alert('Test was successful!');
@@ -47,6 +49,11 @@ export default defineComponent({
                     <label for="humidityOffset" class="form-label">Humidity Offset</label>
                     <input type="number" class="form-control" aria-describedby="humidityOffsetHelp" id="humidityOffset" v-model="humidityOffset">
                     <div id="humidityOffsetHelp" class="form-number">Insert the humidity offset here.</div>
+                    <div class="mb-3">
+                    <label for="keepAlive" class="form-label">Keep Alive (in seconds)</label>
+                    <input type="number" class="form-control" aria-describedby="keepAliveHelp" id="keepAlive" v-model="keepAlive">
+                    <div id="keepAliveHelp" class="form-number">Insert the keepAlive parameter in seconds here.</div>
+                    </div>
                     <button type="submit" class="btn btn-primary mt-2">Submit</button>
                 </form>
             </div>
