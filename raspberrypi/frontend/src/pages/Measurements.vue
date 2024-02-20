@@ -49,9 +49,10 @@ export default defineComponent({
 
         this.shownMeasurements = filtered;
     },
-
-
-
+        formatTemperature(value: number) {
+            return Number(value).toFixed(2);
+        },
+        
         formatDate(timestamp: string) {
             const date = new Date(timestamp);
             return date.toLocaleString();
@@ -80,7 +81,7 @@ export default defineComponent({
                     <tbody>
                         <tr v-for="(entry, index) in shownMeasurements" :key="entry.id">
                             <th scope="row">{{ index + 1 }}</th>
-                            <td>{{ entry.temperature }}</td>
+                            <td>{{ formatTemperature(entry.temperature) }}</td>
                             <td>{{ entry.humidity }}</td>
                             <td>{{ formatDate(entry.timestamp) }}</td>
                         </tr>
