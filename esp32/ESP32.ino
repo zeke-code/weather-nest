@@ -19,7 +19,7 @@ const char* ntpServer = "pool.ntp.org";   // NTP server for clock
 const long utcOffset = 3600;    // Your country's time zone offset
 float temperature_offset = 0;
 float humidity_offset = 0;
-int keep_alive = 30;
+int keep_alive = 30;    // MQTT keep alive variable (timeout after not sending a message to broker)
 
 int measure_delay = 10000;    // Measurements delay
 
@@ -63,8 +63,7 @@ void readTemperature() {
   
   humidity += humidity_offset;
   temperature += temperature_offset;
-  humidity = round(humidity * 100) / 100.0;
-  temperature = round(temperature * 100) / 100.0;
+  temperature = round(temperature, 2);
 
   Serial.printf("Humidity: %.2f%%  Temperature: %.2f°C  Time: %ld \n", humidity, temperature, timeClient.getEpochTime());
 
@@ -132,6 +131,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   float temperatureOffsetPayload = doc["temperatureOffset"];
   float humidityOffsetPayload = doc["humidityOffset"];
   int keepAlivePayload = doc["keepAlive"];
+  int utcOffsetPayload = doc["utcOffset"];
 
   Serial.print("New delay: ");
   Serial.println(delayPayload);
@@ -139,9 +139,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(temperatureOffsetPayload);
   Serial.print("New Humidity Offset: ");
   Serial.println(humidityOffsetPayload);
+  Serial.print("New Keep Alive time: ");
+  Serial.println(keepAlivePayload);
+  Serial.print("New UTC Offset: ");
+  Serial.println(utcOffsetPayload);
 
   measure_delay = delayPayload;
   temperature_offset = temperatureOffsetPayload;
   humidity_offset = humidityOffsetPayload;
   keep_alive = keepAlivePayload;
+  utcOffset = utcOffsetPayload;
 }

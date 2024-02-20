@@ -5,10 +5,11 @@ import axios from 'axios';
 export default defineComponent({
     data() {
         return {
-            delay: 0,
+            delay: 10000,
             temperatureOffset: 0,
             humidityOffset: 0,
-            keepAlive: 0
+            keepAlive: 30,
+            utcOffset: 3600
         }
     },
     methods: {
@@ -19,6 +20,7 @@ export default defineComponent({
                 temperatureOffset: this.temperatureOffset,
                 humidityOffset: this.humidityOffset,
                 keepAlive: this.keepAlive,
+                utcOffset: this.utcOffset
             });
             if (response.status === 200) {
                 alert('Test was successful!');
@@ -46,13 +48,20 @@ export default defineComponent({
                     <input type="number" class="form-control" aria-describedby="temperatureOffsetHelp" id="temperatureOffset" v-model="temperatureOffset">
                     <div id="temperatureOffsetHelp" class="form-number">Insert the temperature offset here.</div>
                     </div>
+                    <div class="mb-3">
                     <label for="humidityOffset" class="form-label">Humidity Offset</label>
                     <input type="number" class="form-control" aria-describedby="humidityOffsetHelp" id="humidityOffset" v-model="humidityOffset">
                     <div id="humidityOffsetHelp" class="form-number">Insert the humidity offset here.</div>
-                    <div class="mb-3 mt-3">
+                    </div>
+                    <div class="mb-3">
                     <label for="keepAlive" class="form-label">Keep Alive (in seconds)</label>
                     <input type="number" class="form-control" aria-describedby="keepAliveHelp" id="keepAlive" v-model="keepAlive">
                     <div id="keepAliveHelp" class="form-number">Insert the keepAlive parameter in seconds here.</div>
+                    </div>
+                    <div class="mb-3">
+                    <label for="utcOffset" class="form-label">UTC Offset</label>
+                    <input type="number" class="form-control" aria-describedby="utcOffsetHelp" id="utcOffset" v-model="utcOffset">
+                    <div id="utcOffsetHelp" class="form-number">Insert the UTC Offset here.</div>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2">Submit</button>
                 </form>

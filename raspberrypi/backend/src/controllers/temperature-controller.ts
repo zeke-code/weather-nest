@@ -4,7 +4,8 @@ import { mqttService } from "../utils/mqtt";
 
 export async function modifyConfiguration(req: Request, res: Response) {
     const message = { delay: req.body.delay, temperatureOffset: req.body.temperatureOffset,
-        humidityOffset: req.body.humidityOffset
+        humidityOffset: req.body.humidityOffset, keepAlive: req.body.keepAlive,
+        utcOffset: req.body.utcOffset
     }
     const messageString = JSON.stringify(message);
     mqttService.publish('esp32/config', messageString);
