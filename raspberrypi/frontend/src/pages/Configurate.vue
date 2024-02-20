@@ -23,7 +23,9 @@ export default defineComponent({
                 utcOffset: this.utcOffset
             });
             if (response.status === 200) {
-                alert('Test was successful!');
+                alert('Configuration on ESP32 updated successfully!');
+            } else {
+                alert('Something went wrong. Try again later.')
             }
         }
     },
