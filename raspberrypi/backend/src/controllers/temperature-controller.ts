@@ -19,3 +19,13 @@ export async function getTemperatures(req: Request, res: Response) {
     );
     res.json(measurements);
 }
+
+export async function getTodayTemperatures(req: Request, res: Response) {
+    const connection = await getConnection();
+    const today = new Date().toISOString().slice(0, 10);
+    const [measurements] = await connection.execute(
+        `SELECT * FROM measurements WHERE DATE(timestamp) = ?`,
+        [today]
+    );
+    res.json(measurements);
+}

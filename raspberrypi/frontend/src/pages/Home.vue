@@ -1,61 +1,84 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Chart from 'chart.js/auto';
+import axios from 'axios';
+
+interface TemperatureData {
+    timestamp: string;
+    temperature: number;
+}
 
 export default defineComponent({
     data() {
         return {
-            // You can place other component data here
+            chart: null,
+            temperatureData: [] as TemperatureData[]
         };
     },
     methods: {
-        createChart(chartId: string) {
+        async fetchTemperatureData() {
+            try {
+                const response = await axios.get('/api/temperatures/today');
+                this.temperatureData = response.data;
+                this.updateChartData();
+            } catch (error) {
+                console.error('Failed to fetch temperature data', error);
+            }
+        },
+        updateChartData() {
+            this.temperatureData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+            const labels = this.temperatureData.map(data => {
+                const date = new Date(data.timestamp);
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${hours}:${minutes}`;
+            });
+            const temperatures = this.temperatureData.map(data => data.temperature);
+        
+            if (this.chart) {
+                const chart = this.chart as Chart;
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = temperatures;
+                chart.update();
+            } else {
+                this.createChart('temperatureChart', labels, temperatures);
+            }
+        },
+        createChart(chartId: string, labels: string[], data: number[]) {
             const canvas = document.getElementById(chartId) as HTMLCanvasElement;
             const ctx = canvas.getContext('2d');
 
             if (ctx) {
-                new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM'],
-                    datasets: [{
-                        label: 'Temperature (°C)',
-                        data: [16, 18, 20, 22, 19, 17],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+                (this.chart as any) = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Temperature (°C)',
+                            data: data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
                     },
-                    responsive: true
-                }
-            });
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        responsive: true
+                    }
+                });
             }
-        },
+        }
     },
     mounted() {
-        this.createChart('temperatureChart');
+        this.fetchTemperatureData();
     }
-})
+});
+
 </script>
 
 <template>

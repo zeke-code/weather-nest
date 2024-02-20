@@ -21,7 +21,7 @@ export default defineComponent({
     },
     methods: {
         async fetchData() {
-            const response = await axios.get('/api/retrievetemperatures');
+            const response = await axios.get('/api/temperatures/all');
             this.measurements = response.data;
             this.shownMeasurements = [...this.measurements];
         },
