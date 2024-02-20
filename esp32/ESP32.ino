@@ -16,7 +16,7 @@ const int mqtt_port = 1883;
 const char* mqtt_topic="temperature";   // MQTT Topic.
 const char* mqtt_callback="esp32/config";
 const char* ntpServer = "pool.ntp.org";   // NTP server for clock
-const long utcOffset = 3600;    // Your country's time zone offset
+int utcOffset = 3600;    // Your country's time zone offset
 float temperature_offset = 0;
 float humidity_offset = 0;
 int keep_alive = 30;    // MQTT keep alive variable (timeout after not sending a message to broker)
@@ -63,7 +63,7 @@ void readTemperature() {
   
   humidity += humidity_offset;
   temperature += temperature_offset;
-  temperature = round(temperature, 2);
+  temperature = round(temperature * 100) / 100;  // Rounds to 2 decimal places
 
   Serial.printf("Humidity: %.2f%%  Temperature: %.2f°C  Time: %ld \n", humidity, temperature, timeClient.getEpochTime());
 
