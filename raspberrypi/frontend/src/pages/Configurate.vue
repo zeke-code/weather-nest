@@ -49,7 +49,7 @@ export default defineComponent({
                     <label for="humidityOffset" class="form-label">Humidity Offset</label>
                     <input type="number" class="form-control" aria-describedby="humidityOffsetHelp" id="humidityOffset" v-model="humidityOffset">
                     <div id="humidityOffsetHelp" class="form-number">Insert the humidity offset here.</div>
-                    <div class="mb-3">
+                    <div class="mb-3 mt-3">
                     <label for="keepAlive" class="form-label">Keep Alive (in seconds)</label>
                     <input type="number" class="form-control" aria-describedby="keepAliveHelp" id="keepAlive" v-model="keepAlive">
                     <div id="keepAliveHelp" class="form-number">Insert the keepAlive parameter in seconds here.</div>

@@ -10,3 +10,12 @@ export async function modifyConfiguration(req: Request, res: Response) {
     mqttService.publish('esp32/config', messageString);
     res.status(200).send('Configuration updated successfully!');
 }
+
+export async function getTemperatures(req: Request, res: Response) {
+    const connection = await getConnection();
+    const [measurements] = await connection.execute(
+        `SELECT * FROM measurements`,
+        []
+    );
+    res.json(measurements);
+}
