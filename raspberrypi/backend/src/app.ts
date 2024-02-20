@@ -1,5 +1,6 @@
 import express, { Express } from 'express'
 import bodyParser from 'body-parser'
+import history from 'connect-history-api-fallback'
 import temperatureRouter from './routers/temperature-router'
 import { mqttService } from './utils/mqtt';
 
@@ -12,6 +13,7 @@ app.use(bodyParser.json());
 
 app.use(temperatureRouter);
 
+app.use(history)
 app.use(express.static('public'));
 app.use(express.static('dist-frontend'));
 app.use(function(req, res, next) {
