@@ -112,10 +112,32 @@ void reconnect_mqtt() {
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  String jsonStr;
-  StaticJsonDocument<256> doc;
-  serializeJson(doc, jsonStr);
-  Serial.print(jsonStr);
   Serial.println("Entering callback function.");
-  deserializeJson(doc, payload, length);
+  String message;
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  StaticJsonDocument<256> doc;
+  DeserializationError error = deserializeJson(doc, message);
+
+  if (error) {
+    Serial.print(F("deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  int delayPayload = doc["delay"];
+  float temperatureOffsetPayload = doc["temperatureOffset"];
+  float humidityOffsetPayload = doc["humidityOffset"];
+
+  Serial.print("New delay: ");
+  Serial.println(delayPayload);
+  Serial.print("New Temperature Offset: ");
+  Serial.println(temperatureOffsetPayload);
+  Serial.print("New Humidity Offset: ");
+  Serial.println(humidityOffsetPayload);
+
+  measure_delay = delayPayload;
+  temperature_offset = temperatureOffsetPayload;
+  humidity_offset = humidityOffsetPayload;
 }

@@ -6,6 +6,7 @@ export async function modifyConfiguration(req: Request, res: Response) {
     const message = { delay: req.body.delay, temperatureOffset: req.body.temperatureOffset,
         humidityOffset: req.body.humidityOffset
     }
-    mqttService.publish('esp32/config', 'Hello World!');
+    const messageString = JSON.stringify(message);
+    mqttService.publish('esp32/config', messageString);
     res.status(200).send('Configuration updated successfully!');
 }
