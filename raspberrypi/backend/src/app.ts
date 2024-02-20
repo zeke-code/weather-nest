@@ -12,7 +12,8 @@ app.use(bodyParser.json());
 
 app.use(temperatureRouter);
 
-app.use(express.static('public'))
+app.use(express.static('public'));
+app.use(express.static('dist-frontend'));
 app.use(function(req, res, next) {
     res.setHeader('Content-Type', 'text/plain');
     res.status(404).send('Ops... page not found!');
