@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 app.use(temperatureRouter);
 
-app.use(history)
+app.use(history())
 app.use(express.static('public'));
 app.use(express.static('dist-frontend'));
 app.use(function(req, res, next) {
